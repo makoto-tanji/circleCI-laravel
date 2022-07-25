@@ -79,6 +79,8 @@ jobs:
           command: |
             ls
             git subtree push --prefix circleCI-laravel/ https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git main
+orbs:
+  heroku: circleci/heroku@1.2.6
 
 workflows:
   version: 2.1
