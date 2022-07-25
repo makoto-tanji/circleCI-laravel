@@ -1,0 +1,255 @@
+
+composer create-project laravel/laravel circleCI-laravel --prefer-dist
+
+データベース
+mysql -u root -p
+CREATE DATABASE CItest_local;
+
+.env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=CItest_local
+DB_USERNAME=root
+DB_PASSWORD=mypass1234
+
+マイグレーション
+php artisan make:migration create_dogs_table
+
+$table->id();
+$table->string('name', 199);
+$table->string('area_id', 199);
+
+php artisan make:migration create_areas_table
+
+$table->id();
+$table->string('area_name', 199);
+
+php artisan migrate
+
+
+
+##################################################
+シーディング
+
+php artisan make:seeder DogsTableSeeder
+php artisan make:seeder AreasTableSeeder
+
+php artisan make:seeder DogsProductTableSeeder
+php artisan make:seeder AreasProductTableSeeder
+
+php artisan make:seeder DogsTestTableSeeder
+php artisan make:seeder AreasTestTableSeeder
+use Illuminate\Support\Facades\DB;
+
+run()
+{
+  $param = [
+    'name' => '',
+    'area' => '',
+    'overview' => '',
+    'img_path' => '',
+  ];
+  DB::table('shops')->insert($param);
+  $param = [
+  ];
+}
+
+DatabaseSeeder.php
+run()
+{
+  $this->call(DogsTableSeeder::class);
+}
+
+php artisan migrate:fresh --seed
+
+php artisan migrate:fresh --seed --env=product
+->ifでproductの方だけ
+->ifの中身は.env「.product」の方(APP_ENV=product じゃない)
+
+
+##################################################
+php artisan make:model Dog
+
+php artisan make:controller DogController --model=Dog
+
+
+##################################################
+テスト
+php artisan make:test AreaTest
+
+vendor\bin\phpunit tests\Feature\AreaTest.php
+
+##################################################
+env
+
+php artisan env
+
+##################################################
+本番用データ(idの末尾4)の用意
+
+
+
+
+
+##################################################
+circleICでのテスト自動化
+
+プロジェクト直下に.circleciディレクトリ作成
+ディレクトリ内にconfig.ymlファイル作成
+
+mysql -u root -p
+CREATE DATABASE CItest_test;
+
+.env.testing
+APP_ENV=test
+APP_KEY=
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=CItest_test
+DB_USERNAME=root
+DB_PASSWORD=mypass1234
+
+
+/config/database.php
+'mysql_test' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => 'demo_test',//編集
+            'username' => 'root',//編集
+            'password' => '',//編集
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+],
+
+
+php artisan key:generate --env=testing
+php artisan config:clear
+
+php artisan migrate:fresh --seed --env=testing
+
+//config/database.phpのconnectionsを参照
+//mysql_test --> CItest_testにlocalとしてシーディングする
+php artisan db:seed --database=mysql_test --env=testing
+
+
+実行
+
+vendor\bin\phpunit tests\Feature\AreaTest.php
+
+
+##################################################
+Heroku
+
+公式サイトでNew
+
+add buildpack php選択
+
+プロジェクト直下にProcfile作成
+以下一行追加
+web: vendor/bin/heroku-php-apache2 public/
+
+
+varchar型の文字数を191に制限
+HTTPSを強制
+AppServiceProvider
+
+use Illuminate\Support\Facades\Schema;
+
+public function boot()
+    {
+        //
+        Schema::defaultStringLength(191);
+        if (\App::environment('production')) {
+            \URL::forceScheme('https');
+        }
+    }
+
+
+cd プロジェクト
+1.ログイン
+heroku login
+
+2.初期化
+git init
+
+3．作成
+heroku create circleci-laravel --buildpack heroku/php
+https://circleci-laravel.herokuapp.com/ | https://git.heroku.com/circleci-laravel.git
+
+
+4．暗号化鍵
+php artisan key:generate --show
+base64:dpFocfLqpS0ej5DW6SIr041r4wrdkuhMyfE+6+urZ8w=
+
+heroku config:set APP_KEY=base64:dpFocfLqpS0ej5DW6SIr041r4wrdkuhMyfE+6+urZ8w=
+
+
+5．プッシュ
+git add -A
+git commit -m ""
+ローカルリポジトリのメインブランチ​から heroku​ リモートにコードをプッシュ
+git push heroku main
+
+##################################################
+DB
+
+heroku addons:create jawsdb
+
+Creating jawsdb on ⬢ circleci-laravel... free
+Database is being provisioned. Your config_var will be set automatically once available.
+Created jawsdb-solid-67996 as JAWSDB_URL
+Use heroku addons:docs jawsdb to view documentation
+
+heroku config:get JAWSDB_URL
+mysql://x7zogk8y7z8vg21l:soyf1dap9nw1o9sl@jhdjjtqo9w5bzq2t.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/uj9ekdbxmw4kx8zo
+
+heroku config:set DB_USERNAME=x7zogk8y7z8vg21l
+heroku config:set DB_PASSWORD=soyf1dap9nw1o9sl
+heroku config:set DB_HOST=jhdjjtqo9w5bzq2t.cbetxkdyhwsb.us-east-1.rds.amazonaws.com
+heroku config:set DB_DATABASE=uj9ekdbxmw4kx8zo
+
+3306はポート番号
+
+確認
+heroku config
+
+heroku run php artisan migrate
+
+                                                                       APPLICATION IN PRODUCTION.
+
+
+  Do you really wish to run this command? (yes/no) [no]
+❯ yes
+
+
+heroku run php artisan migrate:fresh --seed
+->productionで実行されてる
+
+##################################################
+デプロイの自動化
+HerockのアカウントセッティングからAPIキーをコピー
+
+circleCIのプロジェクト内の設定にペースト
+Environment Variables
+
+name:HEROKU_API_KEY
+value:APIキー
+
+name:HEROKU_APP_NAME
+value:herokuのアプリ名（circleci-laravel）
+
+
+git push https://heroku:0c280fcb-39db-4bf8-ac1e-51fa2891aaaf@git.heroku.com/circleci-laravel.git main
