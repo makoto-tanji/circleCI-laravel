@@ -186,15 +186,20 @@ heroku login
 git init
 
 3．作成
+heroku create circleci-laravel
+->https://circleci-laravel.herokuapp.com/ | https://git.heroku.com/circleci-laravel.git
+
+
+
+下はメモ書き程度に
 heroku create circleci-laravel --buildpack heroku/php
-https://circleci-laravel.herokuapp.com/ | https://git.heroku.com/circleci-laravel.git
 
 
 4．暗号化鍵
 php artisan key:generate --show
-base64:dpFocfLqpS0ej5DW6SIr041r4wrdkuhMyfE+6+urZ8w=
+->base64:1UQJEd9qWnU9Hpq2lQIdj2j0N23bi9yVCKlsLsi48SY=
 
-heroku config:set APP_KEY=base64:dpFocfLqpS0ej5DW6SIr041r4wrdkuhMyfE+6+urZ8w=
+heroku config:set APP_KEY=base64:1UQJEd9qWnU9Hpq2lQIdj2j0N23bi9yVCKlsLsi48SY=
 
 
 5．プッシュ
@@ -202,6 +207,9 @@ git add -A
 git commit -m ""
 ローカルリポジトリのメインブランチ​から heroku​ リモートにコードをプッシュ
 git push heroku main
+
+サブディレクトリのみをプッシュ
+git subtree push --prefix api/ heroku master
 
 ##################################################
 DB
