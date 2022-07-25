@@ -209,7 +209,9 @@ git commit -m ""
 git push heroku main
 
 サブディレクトリのみをプッシュ
-git subtree push --prefix api/ heroku master
+git subtree push --prefix circleCI-laravel/ heroku main
+
+git push もしておく
 
 ##################################################
 DB
@@ -222,12 +224,13 @@ Created jawsdb-solid-67996 as JAWSDB_URL
 Use heroku addons:docs jawsdb to view documentation
 
 heroku config:get JAWSDB_URL
-mysql://x7zogk8y7z8vg21l:soyf1dap9nw1o9sl@jhdjjtqo9w5bzq2t.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/uj9ekdbxmw4kx8zo
+->
+mysql://d4q2pgrcoc7y4tx8:de830ts3mci9d3xg@jhdjjtqo9w5bzq2t.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/oton5fdektdlg17n
 
-heroku config:set DB_USERNAME=x7zogk8y7z8vg21l
-heroku config:set DB_PASSWORD=soyf1dap9nw1o9sl
+heroku config:set DB_USERNAME=d4q2pgrcoc7y4tx8
+heroku config:set DB_PASSWORD=de830ts3mci9d3xg
 heroku config:set DB_HOST=jhdjjtqo9w5bzq2t.cbetxkdyhwsb.us-east-1.rds.amazonaws.com
-heroku config:set DB_DATABASE=uj9ekdbxmw4kx8zo
+heroku config:set DB_DATABASE=oton5fdektdlg17n
 
 3306はポート番号
 

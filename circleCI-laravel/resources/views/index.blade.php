@@ -9,7 +9,7 @@
 <body>
   <h1>{{ config('app.env', 'notfound') }}</h1>
   <h1>{{ config('app.name', 'Laravel') }}</h1>
-  <p>test and deploy9</p>
+  <p>test and deploy2</p>
   <table>
   <tr>
     <th>id</th>
