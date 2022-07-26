@@ -18,5 +18,8 @@ class AreaTest extends TestCase
         $this->assertDatabaseHas('areas',[
             'area_name' => 'testpark1'
         ]);
+        $this->assertDatabaseHas('areas',[
+            'area_name' => 'testpark2'
+        ]);
     }
 }
